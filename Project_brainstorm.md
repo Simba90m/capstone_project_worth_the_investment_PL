@@ -118,9 +118,12 @@ the project progresses:
   + 3 questions above.
 - [ ] Technical analysis in Python + SQL (+ Tableau) — pipeline built
   (dbt/DuckDB), notebooks scaffolded; analysis not yet run end-to-end.
-- [ ] Work stored in a GitHub repository — **not yet confirmed**: no `.git`
-  folder found in this project directory as of this check, so verify a repo
-  exists and is pushed before Week 2's check-in.
+- [x] Work stored in a GitHub repository —
+  https://github.com/Simba90m/capstone_project_worth_the_investment_PL
+  (pushed, `main` branch tracking `origin/main`). Note: this is its own
+  standalone repo, separate from the general `Data_Analytics_Bootcamp`
+  folder/repo it lives inside on disk — that's intentional, the capstone
+  needed its own dedicated repo, not to be bundled with other coursework.
 - [x] Data stored in a SQL database — DuckDB (`data/warehouse.duckdb`), a
   local file-based SQL database.
 - [ ] Final presentation (10–15 min), with slides committed to the GitHub
