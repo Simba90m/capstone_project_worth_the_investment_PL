@@ -1,0 +1,21 @@
+version: 2
+
+models:
+  - name: player_value_history
+    description: Time series of market value snapshots per player.
+    columns:
+      - name: player_id
+        tests:
+          - not_null
+
+  - name: player_injury_workload
+    description: Per-player injury and workload summary, feeds the risk score.
+    columns:
+      - name: player_id
+        tests:
+          - unique
+          - not_null
+      - name: date_of_birth
+        description: Pulled through from player_key_map, for age-based analysis.
+      - name: position
+        description: Pulled through from player_key_map, for position-based risk analysis.

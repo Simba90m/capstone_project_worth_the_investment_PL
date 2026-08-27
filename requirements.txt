@@ -1,0 +1,8 @@
+pandas
+kaggle
+dbt-core
+dbt-duckdb        # matches profiles.yml (type: duckdb) -- no DB server needed
+duckdb
+prophet
+matplotlib
+scipy             # stats tests for the stakeholder-hypothesis notebooks

@@ -1,0 +1,17 @@
+name: 'pl_recruitment_capstone'
+version: '1.0.0'
+config-version: 2
+
+profile: 'pl_recruitment_capstone'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+
+models:
+  pl_recruitment_capstone:
+    staging:
+      +materialized: view
+    prep:
+      +materialized: view
+    marts:
+      +materialized: table

@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw loaded tables from the three data sources, before cleaning.
+    tables:
+      # From davidcariboo/player-scores (Kaggle)
+      - name: players
+        description: Player profile table (id, name, birthdate, position, club, ...)
+      - name: player_valuations
+        description: One row per player per valuation date (market value snapshots)
+      - name: appearances
+        description: One row per player per game played (goals, assists, minutes)
+      - name: clubs
+        description: Club reference table (id, name, domestic_competition_id)
+      - name: competitions
+        description: Competition reference table -- filter to Premier League here
+
+      # From irrazional/transfermarkt-injuries (Kaggle)
+      - name: injuries
+        description: One row per injury event (player, injury_type, from_date, until_date)
+
+      # From FBref, via a pre-scraped Kaggle mirror (live scraping blocked
+      # by FBref's Cloudflare protection -- see project README)
+      # akshankrithick/fbref-2017-2024-for-europes-top-5-leagues
+      # (multi-season, 2017-18 through 2023-24, 7 combined season CSVs)
+      - name: fbref_player_stats
+        description: Per-season FBref stats (minutes, appearances, per-90 metrics)

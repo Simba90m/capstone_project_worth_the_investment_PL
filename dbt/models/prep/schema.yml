@@ -1,0 +1,19 @@
+version: 2
+
+models:
+  - name: player_key_map
+    description: >
+      Canonical player identity resolved across the three sources.
+      This is the core matching logic -- see the TODOs in the SQL file
+      for how to extend it once real data reveals name-mismatch patterns.
+    columns:
+      - name: player_id
+        tests:
+          - unique
+          - not_null
+      - name: date_of_birth
+        description: Player date of birth, for computing age (e.g. for the "younger players show better value-risk tradeoff" hypothesis).
+      - name: position
+        description: Player's primary position, from the players source.
+      - name: sub_position
+        description: Player's sub-position, from the players source.
