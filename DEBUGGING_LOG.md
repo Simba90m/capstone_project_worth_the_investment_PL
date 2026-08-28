@@ -133,6 +133,13 @@ sorts before "Jan"), so `most_recent_injury_date` could have been wrong
 even for players with clean data. **Needs a `dbt run` to confirm it
 compiles and to spot-check `most_recent_injury_date` before/after** — not
 yet run, since this fix was made without a live dbt connection.
+**Confirmed working:** `dbt run` passes clean (6/6 models). Data
+spot-check: 107,951 of 107,971 `from_date` values parsed (20 unparseable —
+matches the count the notebook-side fix already found, so nothing new
+went missing), and `player_injury_workload.most_recent_injury_date` now
+returns real, chronologically-sorted dates (e.g. `2024-02-26` correctly
+ranks above `2024-02-19`) — confirming the alphabetical-sort bug described
+above is actually fixed, not just compiling.
 
 ---
 
@@ -197,9 +204,6 @@ cell raises an error.
 ---
 
 ## Open items
-- `stg_transfermarkt_injuries.sql`'s `from_date`/`until_date` fix (entry 8
-  follow-up) needs a `dbt run` to confirm it actually compiles/works
-  against the real data — not yet tested live.
 - Per entry 9: confirm every notebook (not just the two hypothesis
   notebooks) is actually running on the `miniconda3` kernel, not
   `pythoncore-3.14-64` — specifically `00a_fetch_kaggle_data.ipynb` through
