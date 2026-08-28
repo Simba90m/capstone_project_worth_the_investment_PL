@@ -177,6 +177,11 @@ they ran successfully earlier in the project, per the lesson above.
 `dbt run` (via `python -m dbt.cli.main run`, entry 10) succeeded and the
 full notebook ran end to end against the new columns -- see
 `Project_brainstorm.md` for the result.
+**Also checked:** `00a_fetch_kaggle_data.ipynb` through
+`04_recruitment_signal.ipynb` -- all five confirmed already on the
+`miniconda3` kernel. So this was isolated to the two new hypothesis
+notebooks (likely because they were newly created rather than carrying
+forward an existing notebook's kernel setting), not a project-wide issue.
 
 ---
 
@@ -204,9 +209,6 @@ cell raises an error.
 ---
 
 ## Open items
-- Per entry 9: confirm every notebook (not just the two hypothesis
-  notebooks) is actually running on the `miniconda3` kernel, not
-  `pythoncore-3.14-64` — specifically `00a_fetch_kaggle_data.ipynb` through
-  `04_recruitment_signal.ipynb`, still unchecked.
 - Decide whether the position/age hypothesis boxplots are worth adding as
-  Tableau worksheets alongside the existing four.
+  Tableau worksheets alongside the existing four (Week 4 polish, not
+  blocking).
