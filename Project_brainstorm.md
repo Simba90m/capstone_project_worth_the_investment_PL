@@ -193,8 +193,9 @@ been run.
   read: "21-24 emerging players uniquely combine above-average value growth
   with below-average risk," not "value growth falls steadily with age."
   **Caveats:** (1) same 1,310/1,959 (67%) zero-`total_90s_played` exclusion
-  as the position hypothesis — likely the same FBref PL-seasons-only
-  coverage gap, still not directly confirmed; (2) the 21-24 bucket's +7.14%
+  as the position hypothesis — **now confirmed** (see
+  `notebooks/diagnostic_fbref_match_rate.ipynb`) to be a genuine coverage
+  gap, not a name-matching bug; (2) the 21-24 bucket's +7.14%
   could be partly inflated by the same low-starting-valuation "breakout
   debut" effect flagged in hypothesis #1 — worth cross-checking against
   that notebook's `PREV_VALUE_FLOOR`-filtered version before presenting as
@@ -219,12 +220,22 @@ been run.
   discarding it.
   **Caveat to flag either way:** 1,310 of 1,959 players (67%) had zero
   recorded `total_90s_played` and were excluded before the position
-  breakdown even started — likely because `player_value_history` covers a
-  player's whole career while the FBref data only covers PL seasons
-  2017-2024 (so recent joiners / players who weren't at a PL club during
-  that window legitimately have no FBref match), but this hasn't been
-  directly confirmed by checking the actual name-match rate. Worth a line
-  on the Tableau "Flagged: Known Data Limits" sheet regardless of cause.
+  breakdown even started. **Confirmed** via
+  `notebooks/diagnostic_fbref_match_rate.ipynb`: this is a genuine
+  coverage gap, not a name-matching bug. 0 of the 1,310 have *any* exact
+  FBref name match at all (rules out "matched but summed to 0"); 257
+  never had a valuation during the 2017-2024 FBref window at all (clean
+  "too new / not yet a PL target" cases); of the remaining 1,053, a
+  last-name substring check flagged 269 as possible near-matches, but
+  manually reviewing the sample showed every one is a different real
+  player sharing a common surname (e.g. "Alfie Lewis" vs. "Lewis Hall"),
+  not the same player under a different spelling — and several of the
+  true no-matches are independently verifiable as players who genuinely
+  weren't in the Premier League 2017-2024 (Donnarumma at PSG/Milan,
+  Zubimendi at Real Sociedad, both transferring to PL clubs in 2025;
+  Brobbey at Ajax). Worth a line on the Tableau "Flagged: Known Data
+  Limits" sheet regardless — the cause is now understood, but the 67%
+  exclusion itself still stands.
 
 **Status: all three stakeholder hypotheses are now analyzed** — see the
 three notebooks above. None came back as a clean, unqualified "yes"; all

@@ -208,6 +208,32 @@ cell raises an error.
 
 ---
 
+### 11. FBref match-rate diagnostic — confirmed genuine coverage gap, not a bug
+**Context:** entries for hypotheses #2 and #3 (`Project_brainstorm.md`)
+both flagged the same open question: 1,310 of 1,959 players (67%) had
+`total_90s_played == 0` and got excluded before the risk calc even
+started. Was this a real coverage gap or a name-matching bug in
+`player_key_map.sql`?
+**Method:** `notebooks/diagnostic_fbref_match_rate.ipynb` — checked (1)
+whether the zero-workload players have *any* exact FBref name match at
+all (they don't -- 0/1,310), (2) whether they had a valuation snapshot
+during the FBref 2017-2024 window at all (1,053 did, 257 didn't), (3) for
+the 1,053, a last-name substring search against FBref's name list for a
+plausible near-match (269 flagged).
+**Result: genuine coverage gap, not a matching bug.** Manually reviewed
+the near-match sample -- every flagged case was a different real player
+sharing a common surname (e.g. "Alfie Lewis" vs. FBref's "Lewis Hall" /
+"Lewis Dobbin"), not the same player spelled two ways. Several of the
+true no-matches are independently verifiable real players who genuinely
+weren't in the Premier League during 2017-2024 (Gianluigi Donnarumma at
+PSG/AC Milan, Martín Zubimendi at Real Sociedad -- both moved to PL clubs
+in 2025 -- and Brian Brobbey at Ajax). `stg_transfermarkt_values.sql`'s
+"current PL club, full career history" scope plus `stg_fbref_performance.sql`'s
+"PL minutes only, 2017-2024 only" scope explains the gap on its own --
+no fix needed in `player_key_map.sql`.
+
+---
+
 ## Open items
 - Decide whether the position/age hypothesis boxplots are worth adding as
   Tableau worksheets alongside the existing four (Week 4 polish, not
