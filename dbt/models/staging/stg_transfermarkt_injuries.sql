@@ -12,6 +12,16 @@
 -- Fix: strip the suffix with regexp_extract before casting.
 -- 'Games missed' loaded correctly as a plain integer already.
 --
+-- 'from'/'until' are also TEXT, formatted like 'Jan 5, 2021', with a
+-- '-' placeholder for unknown dates mixed in (confirmed by hitting a
+-- literal ValueError parsing them naively -- see DEBUGGING_LOG.md entry
+-- 8). try_strptime returns NULL instead of erroring on anything that
+-- doesn't match the format, so the '-' placeholder becomes a clean NULL
+-- here rather than needing every downstream consumer (SQL or notebook)
+-- to re-parse this itself. DEBUGGING_LOG.md entry 8 originally patched
+-- this on the notebook side only, flagged as an open item; this is that
+-- fix applied at the source instead.
+--
 -- IMPORTANT: this file has its own player_id column, confirmed via direct
 -- overlap check to be the same real Transfermarkt ID used in
 -- stg_transfermarkt_values -- joins on player_id directly, no
@@ -28,8 +38,8 @@ final as (
         lower(trim(player_name)) as name_normalized,
         "Season" as season,
         "Injury" as injury_type,
-        "from" as from_date,
-        "until" as until_date,
+        try_strptime("from", '%b %d, %Y')::date as from_date,
+        try_strptime("until", '%b %d, %Y')::date as until_date,
         try_cast(regexp_extract("Days", '\d+') as integer) as days_missed,
         try_cast("Games missed" as integer) as games_missed
     from injuries

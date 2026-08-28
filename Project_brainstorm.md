@@ -116,8 +116,12 @@ the project progresses:
 
 - [x] Clearly stated business question with background & impact — hypothesis
   + 3 questions above.
-- [ ] Technical analysis in Python + SQL (+ Tableau) — pipeline built
-  (dbt/DuckDB), notebooks scaffolded; analysis not yet run end-to-end.
+- [x] Technical analysis in Python + SQL (+ Tableau) — pipeline runs
+  end-to-end (dbt/DuckDB); all 3 stakeholder-specific hypotheses analyzed
+  with statistical tests (Mann-Whitney, Kruskal-Wallis) in dedicated
+  notebooks. Tableau already covers the 3 general questions (see below);
+  still open whether the stakeholder-hypothesis results get their own
+  Tableau worksheets too.
 - [x] Work stored in a GitHub repository —
   https://github.com/Simba90m/capstone_project_worth_the_investment_PL
   (pushed, `main` branch tracking `origin/main`). Note: this is its own
@@ -169,19 +173,74 @@ been run.
 - **Sporting Directors/Front Office** — *How does injury risk change the
   investment case for a transfer?* Hypothesis: **younger players show a
   better value-risk tradeoff than veterans.**
-  Data status: needed `date_of_birth` wasn't flowing past staging — added
-  it to `player_key_map` → `player_injury_workload` in this update. Needs
-  `dbt run` to materialize, then bucket players by age and compare
-  risk-score vs. value-forecast return per bucket. Not yet analyzed.
+  **Analyzed** in `notebooks/hypothesis_age_vs_value_risk_tradeoff.ipynb`.
+  Result is split — supported on the risk side, not cleanly on the value
+  side. Both Kruskal-Wallis tests came out significant (value growth:
+  H=95.27, p≈0.0000; risk: H=34.57, p≈0.0000), and here the significance
+  carries more weight than hypothesis #1's did, because this test runs one
+  row per player (n=582), not one row per valuation snapshot — no risk of
+  a huge N manufacturing significance out of a trivial effect.
+  **Risk side — supported:** median injury rate rises with age across the
+  buckets with usable sample size — 21-24 "emerging" 2.49, 25-28 "prime"
+  3.97, 29-32 "established" 3.22, 33+ "veteran" 5.95 per 1,000 90s. Not
+  perfectly monotonic (a small dip at 29-32), but the overall direction —
+  younger carries less risk than veterans — holds and is statistically real.
+  **Value side — not a clean "younger = better" story:** median value
+  change is 0.00% in every bucket except 21-24 "emerging" (+7.14%). Under-21
+  also shows 0.00%, but that bucket has only n=4 players — far too small to
+  trust, and the wide box in the plot (spanning up to ~200%) is one or two
+  outlier valuations dominating a tiny sample, not a real pattern. Honest
+  read: "21-24 emerging players uniquely combine above-average value growth
+  with below-average risk," not "value growth falls steadily with age."
+  **Caveats:** (1) same 1,310/1,959 (67%) zero-`total_90s_played` exclusion
+  as the position hypothesis — likely the same FBref PL-seasons-only
+  coverage gap, still not directly confirmed; (2) the 21-24 bucket's +7.14%
+  could be partly inflated by the same low-starting-valuation "breakout
+  debut" effect flagged in hypothesis #1 — worth cross-checking against
+  that notebook's `PREV_VALUE_FLOOR`-filtered version before presenting as
+  clean; (3) Under-21 (n=4) is too small to draw any conclusion from either
+  way and shouldn't be cited as evidence.
 - **Medical/Performance staff** — *Which workload patterns are worth
   flagging before signing a player?* Hypothesis: **position predicts
   injury/workload risk.**
-  Data status: same fix — `position`/`sub_position` now flow through to
-  `player_injury_workload`. Needs `dbt run`, then group injury_count /
-  total_90s_played by position. Not yet analyzed.
+  **Analyzed** in `notebooks/hypothesis_position_vs_injury_risk.ipynb`,
+  after `dbt run` materialized the new columns. **Not statistically
+  supported:** Kruskal-Wallis across the 4 positions (workload-adjusted
+  injury rate, injuries per 1,000 90s played) gave p=0.61 — nowhere near
+  significant. Worth reporting as an honest null result, not hiding it.
+  There's a suggestive-but-unconfirmed pattern underneath: goalkeepers show
+  a much lower group-level rate (1.85 per 1,000 90s vs. 4.27-4.98 for
+  outfield positions), which matches real football knowledge (far less
+  running/sprinting exposure), but only 52 goalkeepers had enough playing
+  time to include, and their individual rates are highly spread out (see
+  the boxplot) — too little data, too much within-group noise, to call it
+  significant. Frame as "direction consistent with known injury patterns,
+  dataset underpowered to confirm" rather than either overclaiming or
+  discarding it.
+  **Caveat to flag either way:** 1,310 of 1,959 players (67%) had zero
+  recorded `total_90s_played` and were excluded before the position
+  breakdown even started — likely because `player_value_history` covers a
+  player's whole career while the FBref data only covers PL seasons
+  2017-2024 (so recent joiners / players who weren't at a PL club during
+  that window legitimately have no FBref match), but this hasn't been
+  directly confirmed by checking the actual name-match rate. Worth a line
+  on the Tableau "Flagged: Known Data Limits" sheet regardless of cause.
 
-**Next steps to actually answer these three:** (1) `dbt run` to rebuild the
-marts with the new columns, (2) add analysis cells to `03_risk_score.ipynb`
-or `04_recruitment_signal.ipynb` for each (age-bucket, position, and
-injury-recency-vs-value-decline), (3) if the results are worth showing,
-add matching Tableau worksheets alongside the existing four.
+**Status: all three stakeholder hypotheses are now analyzed** — see the
+three notebooks above. None came back as a clean, unqualified "yes"; all
+three are honest nuanced/mixed results (which is fine, and worth saying
+plainly in the presentation rather than papering over). Remaining
+next steps:
+1. Confirm the `miniconda3` kernel is actually selected for the original
+   `00a_fetch_kaggle_data.ipynb` through `04_recruitment_signal.ipynb`
+   notebooks too, not just the two hypothesis notebooks already checked —
+   see `DEBUGGING_LOG.md` entry 9's still-open item.
+2. Decide whether any of the three hypothesis results are worth a matching
+   Tableau worksheet alongside the existing four (the position and age
+   notebooks' boxplots are the most presentation-ready).
+3. Optional: the deeper SQL-level date fix for
+   `stg_transfermarkt_injuries.sql` (`DEBUGGING_LOG.md` entry 8, open
+   items) — now actually testable since `dbt run` works end-to-end.
+4. Commit and push all of this (dbt models, notebooks, this doc, the
+   debugging log) to GitHub — the last confirmed push predates this
+   round of changes.
