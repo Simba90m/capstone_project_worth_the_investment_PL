@@ -28,3 +28,8 @@ venv/
 # OS clutter
 .DS_Store
 Thumbs.db
+
+# Presentations and Tableau workbook -- kept local only, not pushed to GitHub
+*.pptx
+~$*.pptx
+*.twbx

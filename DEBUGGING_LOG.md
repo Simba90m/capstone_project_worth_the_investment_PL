@@ -2,7 +2,7 @@
 
 Running log of issues hit while setting up this project and how they were
 resolved. Kept for two reasons: (1) faster fixes if the same thing recurs,
-and (2) legitimate material for the capstone presentation — real-world data
+and (2) legitimate material for the capstone presentation -- real-world data
 projects always involve this kind of friction, and being able to speak to
 it concretely is a stronger story than pretending everything just worked.
 
@@ -33,7 +33,7 @@ error.
 `pandas.read_html(url)` directly) and a `requests` call with a spoofed
 browser `User-Agent` header were blocked with 403.
 **Cause:** FBref uses Cloudflare bot-protection that goes beyond checking
-the User-Agent string — it does deeper request fingerprinting that simple
+the User-Agent string -- it does deeper request fingerprinting that simple
 header spoofing doesn't bypass.
 **Attempted fix:** `cloudscraper` (a library designed to solve Cloudflare's
 challenge automatically).
@@ -43,7 +43,7 @@ challenge automatically).
 ### 4. `ModuleNotFoundError: No module named 'cloudscraper'`
 **Symptom:** Install appeared to succeed, but the notebook still couldn't
 import it.
-**Cause:** Environment mismatch — this machine has both a Miniconda
+**Cause:** Environment mismatch -- this machine has both a Miniconda
 install (`miniconda3`) and a separate `pythoncore-3.14-64` install, and a
 package installed into one isn't visible to the other. This same root
 cause likely explains issue #1 as well.
@@ -62,17 +62,17 @@ fallback to scripted scraping) resulted in the file being deleted shortly
 after download.
 **Likely cause:** Windows Defender / browser download-protection flagging
 the saved HTML as suspicious (not confirmed, but consistent with the
-symptom — worth checking Windows Defender's protection history / quarantine
+symptom -- worth checking Windows Defender's protection history / quarantine
 if this needs revisiting).
 **Resolution:** Abandoned the scraping approach entirely rather than keep
 fighting Cloudflare + AV false positives. Switched to a pre-scraped Kaggle
 mirror of the same FBref data instead:
 `siddhrajthakor/fbref-premier-league-202425-player-stats-dataset`.
-This is now the project's actual FBref data source — see README.
+This is now the project's actual FBref data source -- see README.
 
 ---
 
-### 6. Player ID matching across sources — resolved cleanly
+### 6. Player ID matching across sources -- resolved cleanly
 Not a bug, but worth logging as a design decision: checked whether
 `player_id` in `davidcariboo/player-scores` and `irrazional/transfermarkt-
 injuries` referred to the same players, by computing the ID set overlap
@@ -86,7 +86,7 @@ overlap = values_ids & injury_ids
 ```
 
 **Conclusion:** both datasets use real, shared Transfermarkt internal
-player IDs. These two sources join directly on `player_id` — no
+player IDs. These two sources join directly on `player_id` -- no
 name-matching needed between them. FBref (now Kaggle-sourced) still needs
 name-based matching, since it has no shared ID scheme with Transfermarkt.
 This simplified `player_key_map.sql` significantly from the original plan.
@@ -98,7 +98,7 @@ This simplified `player_key_map.sql` significantly from the original plan.
 `siddhrajthakor/fbref-premier-league-202425-player-stats-dataset` mirror as
 the fix for FBref access. In practice the project ended up built against
 the multi-season `akshankrithick/fbref-2017-2024-for-europes-top-5-leagues`
-dataset instead (7 seasons, 2017-18 through 2023-24) — that's what's
+dataset instead (7 seasons, 2017-18 through 2023-24) -- that's what's
 actually sitting in `data/raw/fbref/` and what `stg_fbref_performance.sql`
 is written against, and it's what `Project_brainstorm.md`'s data-sources
 table always documented.
@@ -109,7 +109,7 @@ dataset the pipeline actually expects.
 
 ---
 
-### 8. `injuries.from_date` — `"-"` placeholder breaks naive date parsing
+### 8. `injuries.from_date` -- `"-"` placeholder breaks naive date parsing
 **Symptom:** `ValueError: time data "-" doesn't match format "%b %d, %Y"`
 from `pd.to_datetime(injuries["from_date"])`, while building the "injury
 recency vs. value decline" hypothesis notebook.
@@ -125,25 +125,25 @@ silent data loss.
 **Follow-up (applied, not yet tested):** `stg_transfermarkt_injuries.sql`
 now parses `from_date`/`until_date` to a real `DATE` type at the source via
 `try_strptime("from", '%b %d, %Y')::date`, the same way entry 1 fixed
-`"Days"` — the `-` placeholder becomes a clean `NULL` instead of every
+`"Days"` -- the `-` placeholder becomes a clean `NULL` instead of every
 consumer needing its own text-parsing workaround. This also fixes a latent
-bug in `player_injury_workload.sql`'s `max(from_date)` — with `from_date`
+bug in `player_injury_workload.sql`'s `max(from_date)` -- with `from_date`
 as TEXT, that `max()` was comparing dates *alphabetically* (e.g. "Feb"
 sorts before "Jan"), so `most_recent_injury_date` could have been wrong
 even for players with clean data. **Needs a `dbt run` to confirm it
-compiles and to spot-check `most_recent_injury_date` before/after** — not
+compiles and to spot-check `most_recent_injury_date` before/after** -- not
 yet run, since this fix was made without a live dbt connection.
 **Confirmed working:** `dbt run` passes clean (6/6 models). Data
-spot-check: 107,951 of 107,971 `from_date` values parsed (20 unparseable —
+spot-check: 107,951 of 107,971 `from_date` values parsed (20 unparseable --
 matches the count the notebook-side fix already found, so nothing new
 went missing), and `player_injury_workload.most_recent_injury_date` now
 returns real, chronologically-sorted dates (e.g. `2024-02-26` correctly
-ranks above `2024-02-19`) — confirming the alphabetical-sort bug described
+ranks above `2024-02-19`) -- confirming the alphabetical-sort bug described
 above is actually fixed, not just compiling.
 
 ---
 
-### 4 (follow-up, corrected). Interpreter mismatch — not actually settled
+### 4 (follow-up, corrected). Interpreter mismatch -- not actually settled
 The earlier note here declared this "settled" based on one notebook run's
 traceback showing the Miniconda interpreter. That was one data point, not
 a fix -- wrong to call it closed. Real evidence: a *different* notebook
@@ -208,13 +208,13 @@ cell raises an error.
 
 ---
 
-### 11. FBref match-rate diagnostic — confirmed genuine coverage gap, not a bug
+### 11. FBref match-rate diagnostic -- confirmed genuine coverage gap, not a bug
 **Context:** entries for hypotheses #2 and #3 (`Project_brainstorm.md`)
 both flagged the same open question: 1,310 of 1,959 players (67%) had
 `total_90s_played == 0` and got excluded before the risk calc even
 started. Was this a real coverage gap or a name-matching bug in
 `player_key_map.sql`?
-**Method:** `notebooks/diagnostic_fbref_match_rate.ipynb` — checked (1)
+**Method:** `notebooks/diagnostic_fbref_match_rate.ipynb` -- checked (1)
 whether the zero-workload players have *any* exact FBref name match at
 all (they don't -- 0/1,310), (2) whether they had a valuation snapshot
 during the FBref 2017-2024 window at all (1,053 did, 257 didn't), (3) for
