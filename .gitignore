@@ -29,7 +29,9 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Presentations and Tableau workbook -- kept local only, not pushed to GitHub
-*.pptx
+# Draft/working presentations and Tableau autosave files -- only the
+# final versions committed under presentations/ are tracked.
+/*.pptx
 ~$*.pptx
-*.twbx
+/*.twbx
+*.twbr
